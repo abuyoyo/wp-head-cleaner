@@ -1,1 +1,3 @@
-wp-head-cleaner
+# WP-Head Cleaner
+
+A WordPress Plugin.
