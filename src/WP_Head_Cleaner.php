@@ -226,8 +226,8 @@ class WP_Head_Cleaner
 						]
 					],
 					[
-						'id'          => 'clean_extra',
-						'title'       => 'Headers Sent',
+						'id'          => 'http_headers',
+						'title'       => 'HTTP Headers',
 						'description' => 'Remove extra HTTP headers added by WordPress.',
 						'fields'      => [
 							[
