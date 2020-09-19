@@ -226,8 +226,8 @@ class WP_Head_Cleaner
 						]
 					],
 					[
-						'id'          => 'clean_extra',
-						'title'       => 'Headers Sent',
+						'id'          => 'http_headers',
+						'title'       => 'HTTP Headers',
 						'description' => 'Remove extra HTTP headers added by WordPress.',
 						'fields'      => [
 							[
@@ -235,6 +235,12 @@ class WP_Head_Cleaner
 								'title' => 'REST API header link',
 								'type' => 'checkbox',
 								'description' => 'Remove Link header for the REST API.',
+							],
+							[
+								'id' => 'wp_shortlink_header',
+								'title' => 'shortlink HTTP header link',
+								'type' => 'checkbox',
+								'description' => 'Remove shortlink from HTTP header.',
 							],
 						]
 					], // section
@@ -332,8 +338,8 @@ class WP_Head_Cleaner
 					case 'disable_oembed_tinymce':
 						add_filter( 'tiny_mce_plugins', [$this,'disable_oembed_tinymce'] );
 						break;
-					
 					case 'rest_output_link_header':
+					case 'wp_shortlink_header':
 						remove_action('template_redirect', $key, 11);
 						break;
 					case 'remove_jquery_migrate':
