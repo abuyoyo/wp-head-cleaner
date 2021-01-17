@@ -423,7 +423,7 @@ class WP_Head_Cleaner
 			$option_name,
 			$title,
 			$description,
-			checked( $options[$id], '1', false)
+			checked( ( $options[$id] ?? false ), '1', false)
 		);
 
 		return $input_tag;
