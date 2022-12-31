@@ -245,7 +245,10 @@ class WP_Head_Cleaner
 						]
 					], // section
 				] // sections
-			] // settings
+			], // settings
+			'methods' => [
+				[ $this, 'on_admin_page'],
+			]
 		];
 
 
@@ -266,9 +269,17 @@ class WP_Head_Cleaner
 
 		$this->admin_page = new AdminPage($args);
 
-		add_filter( 'wphelper/settings_page/input_checkbox', [$this, 'custom_checkbox'], 10, 4 );
+	}
 
-		
+
+
+	/**
+	 * Method that only runs on wp-head-cleaner admin-page/screen/hook
+	 * 
+	 * @since 1.2
+	 */
+	public function on_admin_page(){
+		add_filter( 'wphelper/settings_page/input_checkbox', [$this, 'custom_checkbox'], 10, 4 );
 	}
 
 
