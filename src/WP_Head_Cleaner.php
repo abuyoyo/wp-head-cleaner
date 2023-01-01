@@ -18,6 +18,7 @@
  * @since 1.0
  */
 use WPHelper\AdminPage;
+use WPHelper\PluginCore;
 
 class WP_Head_Cleaner
 {
@@ -55,6 +56,8 @@ class WP_Head_Cleaner
 			'title'    => 'WP-Head Cleaner',
 			'parent'   => 'options',
 			'render'   => 'settings-page', // built-in settings page
+			'plugin_core' => PluginCore::get('wp-head-cleaner'),
+			'plugin_info' => true,
 			'settings' => [
 				'option_name' => $this->option_name, // option_name used in wp_options table
 				// 'option_group' => 'wp_head_cleaner_settings' . '_settings_group', // Optional - Settings group used in register_setting() and settings_fields()
@@ -171,7 +174,7 @@ class WP_Head_Cleaner
 						]
 					],
 					[
-						'id'          => 'disable_omebed',
+						'id'          => 'disable_oembed',
 						'title'       => 'oEmbed',
 						'description' => 'Remove oEmbed functionality.',
 						'fields'      => [
@@ -238,14 +241,17 @@ class WP_Head_Cleaner
 							],
 							[
 								'id' => 'wp_shortlink_header',
-								'title' => 'shortlink HTTP header link',
+								'title' => 'Shortlink HTTP header link',
 								'type' => 'checkbox',
 								'description' => 'Remove shortlink from HTTP header.',
 							],
 						]
 					], // section
 				] // sections
-			] // settings
+			], // settings
+			'methods' => [
+				[ $this, 'on_admin_page'],
+			]
 		];
 
 
@@ -254,21 +260,29 @@ class WP_Head_Cleaner
 		 * 
 		 * @since 1.0
 		 */
-		array_walk(
-			$args['settings']['sections'],
-			function(&$item){
-				$item['description'] = sprintf(
+		if ( $args[ 'render' ] == 'settings-page' ){
+			array_walk(
+				$args[ 'settings' ][ 'sections' ],
+				fn( &$item ) => $item[ 'description' ] = sprintf(
 					'<div class="notice notice-info inline"><p>%s</p></div>',
-					$item['description']
-				);
-			}
-		);
+					$item[ 'description' ]
+				)
+			);
+		}
 
 		$this->admin_page = new AdminPage($args);
 
-		add_filter( 'wphelper/settings_page/input_checkbox', [$this, 'custom_checkbox'], 10, 4 );
+	}
 
-		
+
+
+	/**
+	 * Method that only runs on wp-head-cleaner admin-page/screen/hook
+	 * 
+	 * @since 1.2
+	 */
+	public function on_admin_page(){
+		add_filter( 'wphelper/settings_page/input_checkbox', [$this, 'custom_checkbox'], 10, 4 );
 	}
 
 
@@ -281,21 +295,21 @@ class WP_Head_Cleaner
 	 * 
 	 * @since 1.0
 	 */
-	function clean_wp_head(){
+	function clean_wp_head() {
 		$options = get_option( $this->option_name );
 
-		if (empty($options))
+		if ( empty( $options ) )
 			return;
 
 		foreach ( $options as $key => $option ){
 
-			if ($option){
-				switch($key){
+			if ( $option ){
+				switch( $key ){
 					case 'feed_links':
-						remove_action('wp_head', $key, 2 );
+						remove_action( 'wp_head', $key, 2 );
 						break;
 					case 'feed_links_extra':
-						remove_action('wp_head', $key, 3 );
+						remove_action( 'wp_head', $key, 3 );
 						break;
 
 					//emojis
@@ -308,10 +322,10 @@ class WP_Head_Cleaner
 						remove_action( 'admin_print_styles', $key );
 						break;
 					case 'emoji_dns_prefetch':
-						add_filter( 'wp_resource_hints', [$this,'disable_emojis_remove_dns_prefetch'], 10, 2 );
+						add_filter( 'wp_resource_hints', [ $this,'disable_emojis_remove_dns_prefetch' ], 10, 2 );
 						break;
 					case 'disable_emojis_tinymce':
-						add_filter( 'tiny_mce_plugins', [$this,'disable_emojis_tinymce'] );
+						add_filter( 'tiny_mce_plugins', fn( $plugins ) => array_diff( $plugins, [ 'wpemoji' ] ) );
 						break;
 					case 'wp_staticize_emoji':
 						remove_action( 'the_content_feed', $key );
@@ -321,10 +335,10 @@ class WP_Head_Cleaner
 
 					// oembed
 					case 'wp_oembed_register_route':
-						remove_action('rest_api_init', $key);
+						remove_action( 'rest_api_init', $key );
 						break;
 					case 'embed_rewrite_rules':
-						add_filter( 'rewrite_rules_array', [$this,'embed_rewrite_rules'] );
+						add_filter( 'rewrite_rules_array', fn( $rules ) => array_filter( $rules, fn( $rewrite ) => ( false !== strpos( $rewrite, 'embed=true' ) ) ) );
 						break;
 					case 'disable_oembed_discover':
 						add_filter( 'embed_oembed_discover', '__return_false' );
@@ -336,22 +350,20 @@ class WP_Head_Cleaner
 						remove_filter( 'pre_oembed_result', $key );
 						break;
 					case 'disable_oembed_tinymce':
-						add_filter( 'tiny_mce_plugins', [$this,'disable_oembed_tinymce'] );
+						add_filter( 'tiny_mce_plugins', fn( $plugins ) => array_diff( $plugins, [ 'wpembed' ] ) );
 						break;
 					case 'rest_output_link_header':
 					case 'wp_shortlink_header':
-						remove_action('template_redirect', $key, 11);
+						remove_action( 'template_redirect', $key, 11 );
 						break;
 					case 'remove_jquery_migrate':
-						add_action( 'wp_default_scripts', [$this,'dequeue_jquery_migrate'] );
+						add_action( 'wp_default_scripts', [ $this, 'dequeue_jquery_migrate' ] );
 						break;
 					case 'wp-block-library':
-						add_action( 'wp_print_styles', function() {
-							wp_dequeue_style( 'wp-block-library' );
-						}, 100 );
+						add_action( 'wp_print_styles', fn() => wp_dequeue_style( 'wp-block-library' ), 100 );
 						break;
 					default:
-						remove_action('wp_head', $key);
+						remove_action( 'wp_head', $key );
 						break;
 				}
 			}
@@ -382,81 +394,26 @@ class WP_Head_Cleaner
 
 
 	/**
-	 * Filter function used to remove the tinymce emoji plugin.
-	 * 
-	 * @link https://kinsta.com/knowledgebase/disable-emojis-wordpress/
-	 * 
-	 * @param array $plugins 
-	 * @return array Difference betwen the two arrays
-	 * 
-	 * @since 1.0
-	 */
-	function disable_emojis_tinymce( $plugins ) {
-		if ( is_array( $plugins ) ) {
-			return array_diff( $plugins, array( 'wpemoji' ) );
-		} else {
-			return array();
-		}
-	}
-	
-
-
-	/**
 	 * Remove emoji CDN hostname from DNS prefetching hints.
 	 *
 	 * @link https://kinsta.com/knowledgebase/disable-emojis-wordpress/
 	 * 
 	 * @param array $urls URLs to print for resource hints.
 	 * @param string $relation_type The relation type the URLs are printed for.
-	 * @return array Difference betwen the two arrays.
+	 * @return array Difference between the two arrays.
 	 * 
 	 * @since 1.0
 	 */
 	public function disable_emojis_remove_dns_prefetch( $urls, $relation_type ) {
-		if ( 'dns-prefetch' == $relation_type ) {
-			// $emoji_svg_url = apply_filters( 'emoji_svg_url', 'https://s.w.org/images/core/emoji/2/svg/' );
-			// $emoji_svg_url = apply_filters( 'emoji_svg_url', 'https://s.w.org/images/core/emoji/12.0.0-1/svg/' );
-			// $urls = array_diff( $urls, array( $emoji_svg_url ) );
 
-			$urls = array_filter($urls, function($url){
-				return (strpos($url, 's.w.org') === false);
-			});
-		}
-
-		return $urls;
-	}
-
-
-
-	/**
-	 * Diable oEmbed plugin/script in TinyMCE
-	 * 
-	 * @link https://kinsta.com/knowledgebase/disable-embeds-wordpress/
-	 * 
-	 * @since 1.0
-	 */
-	function disable_oembed_tinymce($plugins) {
-		return array_diff($plugins, array('wpembed'));
-	}
+		// $emoji_svg_url = apply_filters( 'emoji_svg_url', 'https://s.w.org/images/core/emoji/2/svg/' );
+		// $emoji_svg_url = apply_filters( 'emoji_svg_url', 'https://s.w.org/images/core/emoji/12.0.0-1/svg/' );
+		// $urls = array_diff( $urls, array( $emoji_svg_url ) );
 	
-	
-
-	/**
-	 * Remove all oEmbed rewrite rules
-	 * 
-	 * @link https://kinsta.com/knowledgebase/disable-embeds-wordpress/
-	 * 
-	 * @since 1.0
-	 */
-	function embed_rewrite_rules($rules) {
-		foreach($rules as $rule => $rewrite) {
-			if(false !== strpos($rewrite, 'embed=true')) {
-				unset($rules[$rule]);
-			}
-		}
-		return $rules;
+		return ( 'dns-prefetch' == $relation_type )
+			? array_filter( $urls, fn( $url ) => ( strpos( $url, 's.w.org' ) === false ) )
+			: $urls;
 	}
-
 
 
 	/**
@@ -480,7 +437,7 @@ class WP_Head_Cleaner
 			$option_name,
 			$title,
 			$description,
-			checked( $options[$id], '1', false)
+			checked( ( $options[$id] ?? false ), '1', false)
 		);
 
 		return $input_tag;

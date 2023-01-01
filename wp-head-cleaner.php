@@ -6,6 +6,7 @@
  * Author: abuyoyo
  * Author URI: https://github.com/abuyoyo
  * Plugin URI: https://github.com/abuyoyo/wp-head-cleaner
+ * Update URI: https://github.com/abuyoyo/wp-head-cleaner
  * Last Update: 2020_09_19
 */
 
