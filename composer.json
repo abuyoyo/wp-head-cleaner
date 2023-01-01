@@ -3,7 +3,7 @@
     "type": "wordpress-plugin",
 	"description": "Removes unnecessary clutter from wp_head.",
 	"require": {
-		"abuyoyo/plugincore": "~0.14",
-		"abuyoyo/adminmenupage": "~0.12"
+		"abuyoyo/plugincore": "~0.23",
+		"abuyoyo/adminmenupage": "~0.22"
 	}
 }
