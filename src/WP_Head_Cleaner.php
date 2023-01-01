@@ -18,6 +18,7 @@
  * @since 1.0
  */
 use WPHelper\AdminPage;
+use WPHelper\PluginCore;
 
 class WP_Head_Cleaner
 {
@@ -55,6 +56,8 @@ class WP_Head_Cleaner
 			'title'    => 'WP-Head Cleaner',
 			'parent'   => 'options',
 			'render'   => 'settings-page', // built-in settings page
+			'plugin_core' => PluginCore::get('wp-head-cleaner'),
+			'plugin_info' => true,
 			'settings' => [
 				'option_name' => $this->option_name, // option_name used in wp_options table
 				// 'option_group' => 'wp_head_cleaner_settings' . '_settings_group', // Optional - Settings group used in register_setting() and settings_fields()
