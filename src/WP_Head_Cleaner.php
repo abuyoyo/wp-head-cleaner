@@ -338,7 +338,7 @@ class WP_Head_Cleaner
 						remove_action( 'rest_api_init', $key );
 						break;
 					case 'embed_rewrite_rules':
-						add_filter( 'rewrite_rules_array', fn( $rules ) => array_filter( $rules, fn( $rewrite ) => ( false !== strpos( $rewrite, 'embed=true' ) ) ) );
+						add_filter( 'rewrite_rules_array', fn( $rules ) => array_filter( $rules, fn( $rewrite ) => ( false === strpos( $rewrite, 'embed=true' ) ) ) );
 						break;
 					case 'disable_oembed_discover':
 						add_filter( 'embed_oembed_discover', '__return_false' );
