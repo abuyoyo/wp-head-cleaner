@@ -1,5 +1,11 @@
 # WP-Head Cleaner Changelog
 
+## [1.2.1](https://github.com/abuyoyo/wp-head-cleaner/releases/tag/1.2.1)
+Release Date: Jan 2 2023
+
+- Fix `embed_rewrite_rules` option.
+
+
 ## [1.2](https://github.com/abuyoyo/wp-head-cleaner/releases/tag/1.2)
 Release Date: Jan 1 2023
 

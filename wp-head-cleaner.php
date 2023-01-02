@@ -2,12 +2,12 @@
 /**
  * Plugin Name: WP-Head Cleaner
  * Description: Removes unnecessary clutter from wp_head.
- * Version: 1.2
+ * Version: 1.2.1
  * Author: abuyoyo
  * Author URI: https://github.com/abuyoyo
  * Plugin URI: https://github.com/abuyoyo/wp-head-cleaner
  * Update URI: https://github.com/abuyoyo/wp-head-cleaner
- * Last Update: 2023_01_01
+ * Last Update: 2023_01_02
 */
 
 use WPHelper\PluginCore;
