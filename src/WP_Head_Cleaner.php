@@ -172,6 +172,19 @@ class WP_Head_Cleaner
 								'description' => 'Remove emojis from TinyMCE.',
 							],
 						]
+					],// section
+					[
+						'id'		=> 'global_styles',
+						'title' 		=> 'Global Styles',
+						'description' => 'Remove inline styles and svg\'s introduced in WordPress 5.9',
+						'fields'	=> [
+							[
+								'id' => 'global_styles',
+								'title' => 'Global Styles',
+								'type' => 'checkbox',
+								'description' => 'Remove inline styles and svg.',
+							],
+						]
 					],
 					[
 						'id'          => 'disable_oembed',
@@ -333,6 +346,11 @@ class WP_Head_Cleaner
 						remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
 						break;
 
+					//emojis
+					case 'global_styles':
+						add_action( 'init', [ $this,'remove_global_styles' ] );
+						break;
+
 					// oembed
 					case 'wp_oembed_register_route':
 						remove_action( 'rest_api_init', $key );
@@ -413,6 +431,22 @@ class WP_Head_Cleaner
 		return ( 'dns-prefetch' == $relation_type )
 			? array_filter( $urls, fn( $url ) => ( strpos( $url, 's.w.org' ) === false ) )
 			: $urls;
+	}
+
+
+	/**
+	 * Remove 'global_styles'
+	 * 
+	 * @since 1.3
+	 */
+	public function remove_global_styles() {
+		remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles' );
+		remove_action( 'wp_body_open', 'wp_global_styles_render_svg_filters' ); // WP >= 5.9.1
+		remove_action( 'wp_footer', 'wp_enqueue_global_styles', 1 ); // WP 5.9.0
+
+		// backend
+		remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_global_styles_css_custom_properties' );
+		remove_action( 'in_admin_header', 'wp_global_styles_render_svg_filters' );
 	}
 
 
