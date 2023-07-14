@@ -1,5 +1,11 @@
 # WP-Head Cleaner Changelog
 
+## [1.3](https://github.com/abuyoyo/wp-head-cleaner/releases/tag/1.3)
+Release Date: Jul 14 2023
+
+- Remove `global_styles` inline styles and svg's added to every page in WordPress 5.9.
+
+
 ## [1.2.1](https://github.com/abuyoyo/wp-head-cleaner/releases/tag/1.2.1)
 Release Date: Jan 2 2023
 
