@@ -171,6 +171,12 @@ class WP_Head_Cleaner
 								'type' => 'checkbox',
 								'description' => 'Remove emojis from TinyMCE.',
 							],
+							[
+								'id' => 'convert_smilies',
+								'title' => 'Convert Smilies',
+								'type' => 'checkbox',
+								'description' => 'Disable conversion of ASCII smilies to Unicode emojis.',
+							],
 						]
 					],// section
 					[
@@ -339,6 +345,12 @@ class WP_Head_Cleaner
 						break;
 					case 'disable_emojis_tinymce':
 						add_filter( 'tiny_mce_plugins', fn( $plugins ) => array_diff( $plugins, [ 'wpemoji' ] ) );
+						break;
+					case 'convert_smilies':
+						remove_filter( 'the_content', $key, 20 );
+						remove_filter( 'the_excerpt', $key );
+						remove_filter( 'comment_text', $key );
+						add_filter( 'option_use_smilies', '__return_false' ); // fully disable
 						break;
 					case 'wp_staticize_emoji':
 						remove_action( 'the_content_feed', $key );
