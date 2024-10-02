@@ -1,5 +1,11 @@
 # WP-Head Cleaner Changelog
 
+## [1.4](https://github.com/abuyoyo/wp-head-cleaner/releases/tag/1.4)
+Release Date: Oct 2 2024
+
+- Disable `convert_smilies`.
+
+
 ## [1.3](https://github.com/abuyoyo/wp-head-cleaner/releases/tag/1.3)
 Release Date: Jul 14 2023
 
